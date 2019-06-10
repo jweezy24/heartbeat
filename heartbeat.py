@@ -1,6 +1,5 @@
 import os
 import time
-import 
 
 time_low = 0
 time_high = 1
