@@ -5,10 +5,10 @@ from waggle.messaging import Messenger
 from waggle.protocol import pack_sensorgram
 from waggle.protocol import unpack_sensorgram
 import json
+import subprocess as sp
 
-time_low = 0
-time_high = 1
-
+services_name = {}
+services_id = {}
 
 def pack_heartbeat(model):
     if "Cx" in model:
@@ -62,7 +62,38 @@ def sensor_packet(messenger, id):
         print("The id has to be a int")
         return None
 
+def update_services():
+    out = sp.check_output(['systemctl', '-a'])
+    for i in out.decode().split("\n"):
+        temp = i.split("   ")
+        temp_str = str(temp).replace("'',", "").replace("''", "").replace("[", "").replace("]", "").replace('"', "").replace("  ", "")
+        new_temp = temp_str.split(",")
+        if len(new_temp) > 3:
+            val = {new_temp[0].replace("'", "") : (new_temp[1].strip().replace("'", "").replace(" ", "") +
+            '-' + new_temp[2].strip().replace("'", "").replace(" ", "") + '-' + new_temp[3].replace("'", "").replace(" ", ""))}
+            services_name.update(val)
+            fill_services_by_ids(val)
+    return services_name
 
+def get_service_using_name(name):
+    return services_name[name]
+
+def list_service_names():
+    for i in services_name.keys():
+        print(i)
+
+def fill_services_by_ids(val):
+    name = list(val.keys())[0]
+    if name == '1':
+        services_id.update({1:val[name]})
+    if name == '2':
+        services_id.update({2:val[name]})
+    if name == '3':
+        services_id.update({3:val[name]})
+    if name == 'bolt.service':
+        services_id.update({4:val[name]})
 
 if __name__ == "__main__":
-    pack_heartbeat("Cx1")
+    update_services()
+    print(get_service_using_name("bolt.service"))
+    print(services_id)
