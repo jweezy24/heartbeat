@@ -11,8 +11,8 @@ time_high = 1
 
 def do_heartbeat(model):
     if "Cx" in model:
-        serial = ser.Serial('/dev/ttyS1', 9600, timeout=2)
-        messenger = Messenger(ser)
+        serial = ser.Serial('/dev/ttyS2', 9600, timeout=2)
+        messenger = Messenger(serial)
 
         while True:
             req = pack_sensorgram({
