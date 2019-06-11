@@ -10,6 +10,7 @@ import subprocess as sp
 services_name = {}
 services_id = {}
 
+
 def pack_heartbeat(model):
     if "Cx" in model:
         serial = ser.Serial('/dev/ttyS2', 9600, timeout=2)
@@ -53,7 +54,7 @@ def sensor_packet(messenger, id):
         req = pack_sensorgram({
             'sensor_id': id,
             'parameter_id': 0,
-            'value': b'hello',
+            'value': bytes(get_service_using_id(id)),
         })
 
         messenger.write_message(req)
@@ -63,40 +64,40 @@ def sensor_packet(messenger, id):
         return None
 
 def update_services():
-    out = sp.check_output(['systemctl', '-a'])
-    for i in out.decode().split("\n"):
+    out = sp.check_output(["systemctl", "-a"])
+    for i in str(out.decode()).split("\n"):
         temp = i.split("   ")
+        #TODO: do a regex
         temp_str = str(temp).replace("'',", "").replace("''", "").replace("[", "").replace("]", "").replace('"', "").replace("  ", "")
         new_temp = temp_str.split(",")
         if len(new_temp) > 3:
             val = {new_temp[0].replace("'", "") : (new_temp[1].strip().replace("'", "").replace(" ", "") +
             '-' + new_temp[2].strip().replace("'", "").replace(" ", "") + '-' + new_temp[3].replace("'", "").replace(" ", ""))}
-            services_name.update(val)
-            fill_services_by_ids(val)
+            if '●' not in new_temp[0]:
+                services_name.update(val)
     return services_name
 
 def get_service_using_name(name):
-    if name in services_name.keys():
-        return services_name[name]
-    else:
-        return None
+    return services_name.get(name)
+
+def get_service_using_id(id):
+    return services_id.get(id)
 
 def list_service_names():
-    for i in services_name.keys():
-        print(i)
+    return list(services_name.keys())
 
-def fill_services_by_ids(val):
-    name = list(val.keys())[0]
-    if name == '1':
-        services_id.update({1:val[name]})
-    if name == '2':
-        services_id.update({2:val[name]})
-    if name == '3':
-        services_id.update({3:val[name]})
-    if name == 'bolt.service':
-        services_id.update({4:val[name]})
+def fill_services_by_ids():
+    count = 0
+    f = open('./mapping.txt', 'w')
+    for i in list_service_names():
+        f.write( str(i) + " -> " + str(count) + "\n")
+        services_id.update({count: services_name.get(i)})
+        count+=1
+    f.close()
 
 if __name__ == "__main__":
     update_services()
-    print(get_service_using_name("bolt.service"))
-    print(services_id)
+    fill_services_by_ids()
+    #list_service_names()
+    pack_heartbeat("Cx1")
+    #print(services_id)
