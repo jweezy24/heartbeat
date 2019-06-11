@@ -15,18 +15,29 @@ def pack_heartbeat(model):
         messenger = Messenger(serial)
 
         while True:
+            temp = sensor_packet(messenger, 0)
+            if  temp:
+                for resp in temp.read_messages():
+                    print('response')
+                    dict = unpack_sensorgram(resp)
+                    print(dict)
+            else:
+                print("Sensor 0 aint up chief.")
 
-            sensor_packet(messenger, 0)
+            temp = sensor_packet(messenger, 1)
 
-            sensor_packet(messenger, 1)
+            if  temp:
+                for resp in temp.read_messages():
+                    print('response')
+                    dict = unpack_sensorgram(resp)
+                    print(dict)
+            else:
+                print("Sensor 1 aint up chief.")
 
-            for resp in messenger.read_messages():
-                print('response')
-                dict = unpack_sensorgram(resp)
         time.sleep(1)
 
 def sensor_packet(messenger, id):
-    if type(num) == type(0):
+    if type(id) == type(0):
         req = pack_sensorgram({
             'sensor_id': id,
             'parameter_id': 0,
@@ -34,6 +45,7 @@ def sensor_packet(messenger, id):
         })
 
         messenger.write_message(req)
+        return messenger
     else:
         print("The id has to be a int")
         return None
@@ -41,4 +53,4 @@ def sensor_packet(messenger, id):
 
 
 if __name__ == "__main__":
-    do_heartbeat("Cx1")
+    pack_heartbeat("Cx1")
