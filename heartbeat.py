@@ -4,6 +4,7 @@ import serial as ser
 from waggle.messaging import Messenger
 from waggle.protocol import pack_sensorgram
 from waggle.protocol import unpack_sensorgram
+import json
 
 time_low = 0
 time_high = 1
@@ -20,7 +21,8 @@ def pack_heartbeat(model):
                 for resp in temp.read_messages():
                     print('response')
                     dict = unpack_sensorgram(resp)
-                    print(dict)
+                    val = json.loads(resp["value"])
+                    print(val)
             else:
                 print("Sensor 0 aint up chief.")
 
@@ -30,7 +32,8 @@ def pack_heartbeat(model):
                 for resp in temp.read_messages():
                     print('response')
                     dict = unpack_sensorgram(resp)
-                    print(dict)
+                    val = json.loads(resp["value"])
+                    print(val)
             else:
                 print("Sensor 1 aint up chief.")
 
