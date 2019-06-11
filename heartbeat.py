@@ -20,7 +20,7 @@ def do_heartbeat(model):
                 'parameter_id': 0,
                 'value': b'hello',
                 })
-                messenger.write_message(req)
+            messenger.write_message(req)
 
             req = pack_sensorgram({
                 'sensor_id': 2,
