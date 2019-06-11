@@ -16,13 +16,17 @@ def pack_heartbeat(model):
         messenger = Messenger(serial)
 
         while True:
+            val = ''
             temp = sensor_packet(messenger, 0)
             if  temp:
                 for resp in temp.read_messages():
                     print('response')
-                    dict = unpack_sensorgram(resp)
-                    val = json.loads(resp["value"])
-                    print(val)
+                    dict = unpack_sensorgram(dict)
+                    try:
+                        val = json.loads(json.loads(str(dict).replace("b'", ''))["value"])
+                        print(val)
+                    except Exception as e:
+                        print("Error: \t" + str(e))
             else:
                 print("Sensor 0 aint up chief.")
 
@@ -32,7 +36,12 @@ def pack_heartbeat(model):
                 for resp in temp.read_messages():
                     print('response')
                     dict = unpack_sensorgram(resp)
-                    val = json.loads(resp["value"])
+                    try:
+                        print(dict)
+                        val = json.loads(json.loads(str(dict).replace("b'", ''))["value"])
+                        print(val)
+                    except Exception as e:
+                        print("Error: \t" + str(e))
                     print(val)
             else:
                 print("Sensor 1 aint up chief.")
