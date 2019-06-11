@@ -76,7 +76,10 @@ def update_services():
     return services_name
 
 def get_service_using_name(name):
-    return services_name[name]
+    if name in services_name.keys():
+        return services_name[name]
+    else:
+        return None
 
 def list_service_names():
     for i in services_name.keys():
